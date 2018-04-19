@@ -15,6 +15,12 @@ model_select = function(covariates, responses, cutoff){
   } else { return(p_vals)}
 }
 
+make_plot = function(datapath){
+  p_valuing = sapply(as.vector(read.table(datapath, sep = " ")), as.numeric)
+
+  hist(p_valuing)
+}
+
 run_simulation = function(n_trials, n, p, cutoff){
   p_values = c()
   
@@ -23,13 +29,11 @@ run_simulation = function(n_trials, n, p, cutoff){
   selection = model_select(generator[["covariates"]], generator[["responses"]], cutoff)
   p_values = c(p_values, selection)
   }
+  print(p_values)
   
-  hist(p_values)
+  write.table(p_values, file  = "p_valuer.txt", sep = " ")
+  
+  make_plot("p_valuer.txt")
 }
 
-ner = c(100, 1000, 10000)
-for (i in ner){
-  run_simulation(100, i, 10, 0.05)
-  run_simulation(100, i, 20, 0.05)
-  run_simulation(100, i, 50, 0.05)
-}
+mapply(FUN = run_simulation, n_trials = 10, n = ner, p = per, cutoff = 0.05)
